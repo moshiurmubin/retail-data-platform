@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # 00 Setup
 # MAGIC Creates the Unity Catalog objects the platform needs: catalog, the four
@@ -18,6 +22,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.config import load_config
 from common_utils.logging import get_logger
 from common_utils.notebook import get_run_params, run_log_table

@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Gold: dim_date
 # MAGIC One row per calendar day (SEQUENCE + EXPLODE, Class 5), `date_key = yyyyMMdd`,
@@ -17,6 +21,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.config import load_config
 from common_utils.generic_functions import assert_not_empty_and_unique, write_delta
 from common_utils.notebook import get_run_params, run_log_table

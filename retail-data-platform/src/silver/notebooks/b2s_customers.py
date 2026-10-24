@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Silver: customers (bronze.sqlserver_customers -> silver)
 # MAGIC 1. Read this run's Bronze rows
@@ -21,6 +25,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.bronze import read_bronze_for_date
 from common_utils.config import load_config
 from common_utils.data_quality import split_valid_invalid, write_quarantine

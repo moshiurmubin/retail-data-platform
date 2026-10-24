@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "2"
+# ///
 # MAGIC %md
 # MAGIC # Silver: sales orders (bronze.cosmosdb_sales_orders -> 4 silver tables)
 # MAGIC Semi-structured JSON (Class 14): `from_json()` with a schema, `explode()` the arrays,
@@ -26,6 +30,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.bronze import read_bronze_for_date
 from common_utils.config import load_config
 from common_utils.data_quality import split_valid_invalid, write_quarantine

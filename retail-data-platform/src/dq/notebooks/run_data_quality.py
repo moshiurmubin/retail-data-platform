@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "2"
+# ///
 # MAGIC %md
 # MAGIC # Data quality: Silver + Gold checks
 # MAGIC Every table has its own config in `src/dq/config/config_dq_*.json`
@@ -20,6 +24,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 import os
 import uuid
 
@@ -60,6 +65,13 @@ table_cache = {name: spark.read.table(name) for name in needed}
 
 # COMMAND ----------
 
+_existing_cols = set(spark.read.table(audit_table).columns)
+if "checked_at" in _existing_cols:
+    spark.sql(f"ALTER TABLE {audit_table} SET TBLPROPERTIES ('delta.columnMapping.mode' = 'name')")
+    spark.sql(f"ALTER TABLE {audit_table} RENAME COLUMN checked_at TO run_timestamp")
+_to_add = [f"{c} {t}" for c, t in {"layer": "STRING", "total_records": "BIGINT", "on_failure": "STRING"}.items() if c not in _existing_cols]
+if _to_add:
+    spark.sql(f"ALTER TABLE {audit_table} ADD COLUMNS ({', '.join(_to_add)})")
 create_dq_audit_table(spark, audit_table)
 
 all_results = []

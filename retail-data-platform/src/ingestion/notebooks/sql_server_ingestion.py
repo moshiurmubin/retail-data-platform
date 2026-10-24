@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Ingestion: SQL Server (CRM customers) -> raw volume
 # MAGIC Reads `retail.customers` over JDBC and lands it **as-is** as CSV in
@@ -17,6 +21,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.config import load_config
 from common_utils.ingestor import read_jdbc, write_raw
 from common_utils.logging import get_logger

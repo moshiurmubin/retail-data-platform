@@ -14,7 +14,7 @@ def _resolve(value, params):
     if isinstance(value, list):
         return [_resolve(item, params) for item in value]
     if isinstance(value, dict):
-        return {key: _resolve(item, params) for key, item in value.items()}
+                return {_resolve(key, params): _resolve(item, params) for key, item in value.items()}
     return value
 
 

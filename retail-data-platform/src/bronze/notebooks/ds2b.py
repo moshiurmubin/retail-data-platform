@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Bronze: raw volume -> Bronze Delta tables (ds2b = data source to bronze)
 # MAGIC One config-driven notebook for all three sources (Class 11).
@@ -19,6 +23,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.bronze import read_raw, bronze_ingestor
 from common_utils.config import load_config
 from common_utils.logging import get_logger

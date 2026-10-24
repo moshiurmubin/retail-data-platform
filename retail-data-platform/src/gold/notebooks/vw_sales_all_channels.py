@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Gold: vw_sales_all_channels
 # MAGIC The single source of truth for revenue (the Class 8 problem): online and store
@@ -17,6 +21,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.config import load_config
 from common_utils.notebook import get_run_params, run_log_table
 from common_utils.audit import RunLogger

@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Ingestion: Amazon S3 (store / POS sales) -> raw volume
 # MAGIC Reads `sales.parquet` from S3 and lands it **as-is** as Parquet in
@@ -17,6 +21,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.config import load_config
 from common_utils.ingestor import read_s3_parquet, write_raw
 from common_utils.logging import get_logger

@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Ingestion: Cosmos DB (web-shop orders) -> raw volume
 # MAGIC Reads every document of `retail.sales_orders` through the MongoDB API (PyMongo)
@@ -20,6 +24,7 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
 from common_utils.config import load_config
 from common_utils.ingestor import read_cosmosdb_json, write_raw
 from common_utils.logging import get_logger
@@ -36,21 +41,23 @@ run = RunLogger(spark, run_log_table(params["catalog"]), params["job_run_id"], "
 
 # COMMAND ----------
 
-try:
-    connection_string = dbutils.secrets.get(scope=params["secret_scope"], key=source["connection_string_secret"])
-
-    df = read_cosmosdb_json(
-        spark, connection_string, source["database_name"], source["collection_name"], source["column_name"]
-    )
-    rows = df.count()
-
-    if rows == 0:
-        logger.warning("Cosmos DB returned 0 documents")
-
-    target_path = f"{target['base_path']}/{target['folder']}/load_date={params['run_date']}"
-    write_raw(df, target_path, target["file_format"], target["mode"], config.get("write_options"))
-
-    run.success(target=target_path, row_count=rows)
-except Exception as e:
-    run.failure(e)
-    raise
+# MAGIC %pip install pymongo==4.10.1
+# MAGIC
+# MAGIC try:
+# MAGIC     connection_string = dbutils.secrets.get(scope=params["secret_scope"], key=source["connection_string_secret"])
+# MAGIC
+# MAGIC     df = read_cosmosdb_json(
+# MAGIC         spark, connection_string, source["database_name"], source["collection_name"], source["column_name"]
+# MAGIC     )
+# MAGIC     rows = df.count()
+# MAGIC
+# MAGIC     if rows == 0:
+# MAGIC         logger.warning("Cosmos DB returned 0 documents")
+# MAGIC
+# MAGIC     target_path = f"{target['base_path']}/{target['folder']}/load_date={params['run_date']}"
+# MAGIC     write_raw(df, target_path, target["file_format"], target["mode"], config.get("write_options"))
+# MAGIC
+# MAGIC     run.success(target=target_path, row_count=rows)
+# MAGIC except Exception as e:
+# MAGIC     run.failure(e)
+# MAGIC     raise

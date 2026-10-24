@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Governance (Unity Catalog)
 # MAGIC Driven by `config_governance.json`, re-applied after every load:
@@ -22,6 +26,10 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 # COMMAND ----------
+
+import importlib, common_utils.config
+importlib.reload(common_utils.config)
+
 from common_utils.config import load_config
 from common_utils.logging import get_logger
 from common_utils.notebook import get_run_params, run_log_table
