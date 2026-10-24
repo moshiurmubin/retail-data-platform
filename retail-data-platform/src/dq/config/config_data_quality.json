@@ -1,0 +1,22 @@
+{
+    "run": {
+        "layer": "SILVER_GOLD",
+        "audit_table": "{catalog}.audit.dq_results",
+        "fail_on_error": true
+    },
+    "configs": [
+        "config_dq_customers.json",
+        "config_dq_customers_history.json",
+        "config_dq_sales_orders.json",
+        "config_dq_order_products.json",
+        "config_dq_promotions.json",
+        "config_dq_clicked_items.json",
+        "config_dq_sales.json",
+        "config_dq_dim_customer.json",
+        "config_dq_dim_product.json",
+        "config_dq_dim_date.json",
+        "config_dq_dim_order.json",
+        "config_dq_fact_sales.json",
+        "config_dq_fact_pos_sales.json"
+    ]
+}

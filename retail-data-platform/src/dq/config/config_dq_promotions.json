@@ -1,0 +1,37 @@
+{
+    "table": "{catalog}.silver.promotions",
+    "layer": "SILVER",
+    "checks": [
+        {
+            "name": "order_number_not_null",
+            "type": "not_null",
+            "column": "order_number",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "promo_product_id_not_null",
+            "type": "not_null",
+            "column": "promo_product_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "discount_range",
+            "type": "range",
+            "column": "discount",
+            "min": 0,
+            "max": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "promo_quantity_range",
+            "type": "range",
+            "column": "promo_quantity",
+            "min": 0,
+            "severity": "error",
+            "on_failure": "fail"
+        }
+    ]
+}

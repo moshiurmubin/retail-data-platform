@@ -1,0 +1,54 @@
+{
+    "table": "{catalog}.silver.sales",
+    "layer": "SILVER",
+    "checks": [
+        {
+            "name": "sales_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_not_null",
+            "type": "not_null",
+            "column": "customer_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_date_not_null",
+            "type": "not_null",
+            "column": "order_date",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_product_id_order_date_unique",
+            "type": "unique",
+            "columns": [
+                "customer_id",
+                "product_id",
+                "order_date"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "quantity_range",
+            "type": "range",
+            "column": "quantity",
+            "min": 0,
+            "severity": "warn",
+            "on_failure": "warn"
+        },
+        {
+            "name": "total_price_range",
+            "type": "range",
+            "column": "total_price",
+            "min": 0,
+            "severity": "warn",
+            "on_failure": "warn"
+        }
+    ]
+}

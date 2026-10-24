@@ -1,0 +1,21 @@
+{
+    "source": {
+        "name": "sqlserver",
+        "url": "jdbc:sqlserver://rivadata.database.windows.net:1433;databaseName=batch2;encrypt=true;trustServerCertificate=true;loginTimeout=90",
+        "user_secret": "sqlserver-username",
+        "password_secret": "sqlserver-password",
+        "dbtable": "retail.customers",
+        "driver": "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+    },
+    "target": {
+        "base_path": "/Volumes/{catalog}/bronze/raw_data",
+        "folder": "sqlserver_customers",
+        "file_format": "csv",
+        "mode": "overwrite"
+    },
+    "write_options": {
+        "header": "true",
+        "quoteAll": "true",
+        "escape": "\""
+    }
+}

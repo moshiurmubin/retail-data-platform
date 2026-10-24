@@ -1,0 +1,18 @@
+{
+    "source": {
+        "order_products_table": "{catalog}.silver.order_products",
+        "sales_table": "{catalog}.silver.sales"
+    },
+    "target": {
+        "target_table": "{catalog}.gold.dim_product"
+    },
+    "select_columns": [
+        "product_id",
+        "product_name",
+        "unit",
+        "category"
+    ],
+    "cast_columns": {
+        "product_id": "string"
+    }
+}

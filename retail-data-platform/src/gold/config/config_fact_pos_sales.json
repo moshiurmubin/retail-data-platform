@@ -1,0 +1,30 @@
+{
+    "source": {
+        "sales": "{catalog}.silver.sales"
+    },
+    "dimensions": {
+        "dim_customer": "{catalog}.gold.dim_customer",
+        "dim_product": "{catalog}.gold.dim_product",
+        "dim_date": "{catalog}.gold.dim_date"
+    },
+    "target": {
+        "target_table": "{catalog}.gold.fact_pos_sales"
+    },
+    "select_columns": [
+        "customer_id",
+        "product_id",
+        "order_date_key",
+        "qty",
+        "unit_price",
+        "total_amount",
+        "channel"
+    ],
+    "cast_columns": {
+        "customer_id": "long",
+        "product_id": "string",
+        "order_date_key": "int",
+        "qty": "long",
+        "unit_price": "double",
+        "total_amount": "double"
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "base_raw_path": "/Volumes/{catalog}/bronze/raw_data",
+    "sources": {
+        "sqlserver_customers": {
+            "raw_folder": "sqlserver_customers",
+            "file_format": "csv",
+            "read_options": {
+                "header": "true",
+                "inferSchema": "true",
+                "escape": "\""
+            },
+            "target_table": "{catalog}.bronze.sqlserver_customers",
+            "source_system": "sqlserver"
+        },
+        "cosmosdb_sales_orders": {
+            "raw_folder": "cosmosdb_sales_orders",
+            "file_format": "json",
+            "read_options": {},
+            "target_table": "{catalog}.bronze.cosmosdb_sales_orders",
+            "source_system": "cosmosdb"
+        },
+        "s3_sales": {
+            "raw_folder": "s3_sales",
+            "file_format": "parquet",
+            "read_options": {},
+            "target_table": "{catalog}.bronze.s3_sales",
+            "source_system": "s3"
+        }
+    }
+}

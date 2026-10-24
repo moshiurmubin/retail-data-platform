@@ -1,0 +1,27 @@
+{
+    "table": "{catalog}.silver.customers_history",
+    "layer": "SILVER",
+    "checks": [
+        {
+            "name": "customers_history_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "is_current_not_null",
+            "type": "expression",
+            "expression": "is_current IS NOT NULL",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "closed_rows_have_end_date",
+            "type": "expression",
+            "expression": "is_current OR effective_to IS NOT NULL",
+            "severity": "error",
+            "on_failure": "fail"
+        }
+    ]
+}

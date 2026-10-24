@@ -1,0 +1,36 @@
+{
+    "table": "{catalog}.gold.dim_product",
+    "layer": "GOLD",
+    "checks": [
+        {
+            "name": "dim_product_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "product_id_not_null",
+            "type": "not_null",
+            "column": "product_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "product_id_unique",
+            "type": "unique",
+            "columns": [
+                "product_id"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "product_name_not_null",
+            "type": "not_null",
+            "column": "product_name",
+            "severity": "warn",
+            "on_failure": "warn"
+        }
+    ]
+}

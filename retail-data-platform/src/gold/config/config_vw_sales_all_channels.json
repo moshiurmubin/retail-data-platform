@@ -1,0 +1,5 @@
+{
+    "view": "{catalog}.gold.vw_sales_all_channels",
+    "online_fact": "{catalog}.gold.fact_sales",
+    "store_fact": "{catalog}.gold.fact_pos_sales"
+}

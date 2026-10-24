@@ -1,0 +1,32 @@
+{
+    "target": {
+        "target_table": "{catalog}.gold.dim_date"
+    },
+    "transform": {
+        "start_date": "2015-01-01",
+        "end_date": "2030-12-31"
+    },
+    "select_columns": [
+        "date_key",
+        "date",
+        "day",
+        "month",
+        "month_name",
+        "year",
+        "quarter",
+        "week",
+        "day_name",
+        "day_of_week",
+        "is_weekend"
+    ],
+    "cast_columns": {
+        "date_key": "int",
+        "date": "date",
+        "day": "int",
+        "month": "int",
+        "year": "int",
+        "quarter": "int",
+        "week": "int",
+        "day_of_week": "int"
+    }
+}

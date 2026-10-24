@@ -1,0 +1,313 @@
+resources:
+  jobs:
+
+    # ================================================================
+    # DAILY PIPELINE: setup -> ingestion -> bronze -> silver -> gold
+    #                 -> data quality -> governance
+    # ================================================================
+    retail_data_platform:
+      name: retail-data-platform-${bundle.target}
+      description: >-
+        Daily retail data platform. SQL Server, Cosmos DB and S3 are landed in
+        the raw volume, loaded to Bronze, cleaned and historised in Silver
+        (SCD1/SCD2, quarantine), modelled as a Kimball star schema in Gold,
+        validated by data quality checks and governed in Unity Catalog.
+
+      max_concurrent_runs: 1
+      timeout_seconds: 7200
+      queue:
+        enabled: true
+
+      tags:
+        application: retail-data-platform
+        environment: ${bundle.target}
+        owner: data-engineering
+
+      schedule:
+        quartz_cron_expression: "0 0 5 * * ?"
+        timezone_id: Europe/London
+        pause_status: ${var.schedule_pause_status}
+
+      email_notifications:
+        on_failure:
+          - ${var.alert_email}
+        on_duration_warning_threshold_exceeded:
+          - ${var.alert_email}
+        no_alert_for_skipped_runs: true
+
+      health:
+        rules:
+          - metric: RUN_DURATION_SECONDS
+            op: GREATER_THAN
+            value: 3600
+
+      # Pushed to every notebook as widgets
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: secret_scope
+          default: ${var.secret_scope}
+        - name: run_date
+          default: "{{job.start_time.iso_date}}"
+        - name: job_run_id
+          default: "{{job.run_id}}"
+
+      environments:
+        - environment_key: platform
+          spec:
+            client: "2"
+            dependencies:
+              - pymongo==4.10.1
+
+      tasks:
+
+        - task_key: setup
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/setup/notebooks/00_setup.py
+            base_parameters:
+              path: ../config/config_setup.json
+
+        - task_key: ingest_sqlserver
+          depends_on:
+            - task_key: setup
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          notebook_task:
+            notebook_path: ../src/ingestion/notebooks/sql_server_ingestion.py
+            base_parameters:
+              path: ../config/config_sqlserver.json
+
+        - task_key: ingest_cosmosdb
+          depends_on:
+            - task_key: setup
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          notebook_task:
+            notebook_path: ../src/ingestion/notebooks/cosmosdb_ingestion.py
+            base_parameters:
+              path: ../config/config_cosmosdb.json
+
+        - task_key: ingest_s3
+          depends_on:
+            - task_key: setup
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 2
+          min_retry_interval_millis: 300000
+          notebook_task:
+            notebook_path: ../src/ingestion/notebooks/s3_ingestion.py
+            base_parameters:
+              path: ../config/config_s3.json
+
+        - task_key: bronze
+          depends_on:
+            - task_key: ingest_sqlserver
+            - task_key: ingest_cosmosdb
+            - task_key: ingest_s3
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/bronze/notebooks/ds2b.py
+            base_parameters:
+              path: ../config/config_ds2b.json
+
+        - task_key: silver_customers
+          depends_on:
+            - task_key: bronze
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/silver/notebooks/b2s_customers.py
+            base_parameters:
+              path: ../config/config_b2s_customers.json
+
+        - task_key: silver_sales_orders
+          depends_on:
+            - task_key: bronze
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/silver/notebooks/b2s_sales_orders.py
+            base_parameters:
+              path: ../config/config_b2s_sales_orders.json
+
+        - task_key: silver_sales
+          depends_on:
+            - task_key: bronze
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/silver/notebooks/b2s_sales.py
+            base_parameters:
+              path: ../config/config_b2s_sales.json
+
+        - task_key: gold_dim_date
+          depends_on:
+            - task_key: setup
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/dim_date.py
+            base_parameters:
+              path: ../config/config_dim_date.json
+
+        - task_key: gold_dim_customer
+          depends_on:
+            - task_key: silver_customers
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/dim_customer.py
+            base_parameters:
+              path: ../config/config_dim_customer.json
+
+        - task_key: gold_dim_product
+          depends_on:
+            - task_key: silver_sales_orders
+            - task_key: silver_sales
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/dim_product.py
+            base_parameters:
+              path: ../config/config_dim_product.json
+
+        - task_key: gold_dim_order
+          depends_on:
+            - task_key: silver_sales_orders
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/dim_order.py
+            base_parameters:
+              path: ../config/config_dim_order.json
+
+        - task_key: gold_fact_sales
+          depends_on:
+            - task_key: gold_dim_customer
+            - task_key: gold_dim_product
+            - task_key: gold_dim_date
+            - task_key: gold_dim_order
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/fact_sales.py
+            base_parameters:
+              path: ../config/config_fact_sales.json
+
+        - task_key: gold_fact_pos_sales
+          depends_on:
+            - task_key: gold_dim_customer
+            - task_key: gold_dim_product
+            - task_key: gold_dim_date
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/fact_pos_sales.py
+            base_parameters:
+              path: ../config/config_fact_pos_sales.json
+
+        - task_key: gold_vw_sales_all_channels
+          depends_on:
+            - task_key: gold_fact_sales
+            - task_key: gold_fact_pos_sales
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/gold/notebooks/vw_sales_all_channels.py
+            base_parameters:
+              path: ../config/config_vw_sales_all_channels.json
+
+        - task_key: data_quality
+          depends_on:
+            - task_key: gold_vw_sales_all_channels
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 0
+          notebook_task:
+            notebook_path: ../src/dq/notebooks/run_data_quality.py
+            base_parameters:
+              path: ../config/config_data_quality.json
+
+        - task_key: governance
+          depends_on:
+            - task_key: data_quality
+          run_if: ALL_SUCCESS
+          environment_key: platform
+          max_retries: 1
+          min_retry_interval_millis: 60000
+          notebook_task:
+            notebook_path: ../src/governance/notebooks/apply_governance.py
+            base_parameters:
+              path: ../config/config_governance.json
+
+      permissions:
+        - level: CAN_VIEW
+          group_name: users
+
+    # ================================================================
+    # WEEKLY MAINTENANCE: OPTIMIZE + VACUUM every Delta table
+    # ================================================================
+    retail_data_platform_maintenance:
+      name: retail-data-platform-maintenance-${bundle.target}
+      max_concurrent_runs: 1
+      timeout_seconds: 3600
+
+      schedule:
+        quartz_cron_expression: "0 0 7 ? * SUN"
+        timezone_id: Europe/London
+        pause_status: ${var.schedule_pause_status}
+
+      email_notifications:
+        on_failure:
+          - ${var.alert_email}
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_date
+          default: "{{job.start_time.iso_date}}"
+        - name: job_run_id
+          default: "{{job.run_id}}"
+
+      environments:
+        - environment_key: platform
+          spec:
+            client: "2"
+
+      tasks:
+        - task_key: optimize_vacuum
+          environment_key: platform
+          notebook_task:
+            notebook_path: ../src/maintenance/notebooks/optimize_tables.py
+            base_parameters:
+              path: ../config/config_maintenance.json

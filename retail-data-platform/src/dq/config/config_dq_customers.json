@@ -1,0 +1,66 @@
+{
+    "table": "{catalog}.silver.customers",
+    "layer": "SILVER",
+    "checks": [
+        {
+            "name": "customers_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_not_null",
+            "type": "not_null",
+            "column": "customer_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_unique",
+            "type": "unique",
+            "columns": [
+                "customer_id"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "last_name_not_null",
+            "type": "not_null",
+            "column": "last_name",
+            "severity": "warn",
+            "on_failure": "warn"
+        },
+        {
+            "name": "last_update_ts_not_null",
+            "type": "not_null",
+            "column": "last_update_ts",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "loyalty_segment_accepted",
+            "type": "accepted_values",
+            "column": "loyalty_segment",
+            "values": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ],
+            "severity": "warn",
+            "on_failure": "warn"
+        },
+        {
+            "name": "customers_fresh",
+            "type": "freshness",
+            "column": "last_update_ts",
+            "max_age_minutes": 1440,
+            "severity": "warn",
+            "on_failure": "warn"
+        }
+    ]
+}

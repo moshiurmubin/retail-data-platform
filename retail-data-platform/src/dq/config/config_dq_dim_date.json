@@ -1,0 +1,63 @@
+{
+    "table": "{catalog}.gold.dim_date",
+    "layer": "GOLD",
+    "checks": [
+        {
+            "name": "dim_date_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "date_key_not_null",
+            "type": "not_null",
+            "column": "date_key",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "date_key_unique",
+            "type": "unique",
+            "columns": [
+                "date_key"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "date_not_null",
+            "type": "not_null",
+            "column": "date",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "month_range",
+            "type": "range",
+            "column": "month",
+            "min": 1,
+            "max": 12,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "quarter_range",
+            "type": "range",
+            "column": "quarter",
+            "min": 1,
+            "max": 4,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "day_range",
+            "type": "range",
+            "column": "day",
+            "min": 1,
+            "max": 31,
+            "severity": "error",
+            "on_failure": "fail"
+        }
+    ]
+}

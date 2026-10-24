@@ -1,0 +1,15 @@
+{
+    "source": {
+        "name": "s3",
+        "access_key_secret": "aws-access-key-id",
+        "secret_key_secret": "aws-secret-access-key",
+        "path": "bucket-rivadata/retail/sales.parquet"
+    },
+    "target": {
+        "base_path": "/Volumes/{catalog}/bronze/raw_data",
+        "folder": "s3_sales",
+        "file_format": "parquet",
+        "mode": "overwrite"
+    },
+    "write_options": {}
+}

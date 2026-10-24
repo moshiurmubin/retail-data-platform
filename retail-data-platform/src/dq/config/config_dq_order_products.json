@@ -1,0 +1,53 @@
+{
+    "table": "{catalog}.silver.order_products",
+    "layer": "SILVER",
+    "checks": [
+        {
+            "name": "order_products_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_number_not_null",
+            "type": "not_null",
+            "column": "order_number",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "product_id_not_null",
+            "type": "not_null",
+            "column": "product_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_number_product_id_unique",
+            "type": "unique",
+            "columns": [
+                "order_number",
+                "product_id"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "qty_range",
+            "type": "range",
+            "column": "qty",
+            "min": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "price_range",
+            "type": "range",
+            "column": "price",
+            "min": 0,
+            "severity": "error",
+            "on_failure": "fail"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "optimize_tables": [
+        "{catalog}.bronze.sqlserver_customers",
+        "{catalog}.bronze.cosmosdb_sales_orders",
+        "{catalog}.bronze.s3_sales",
+        "{catalog}.silver.customers",
+        "{catalog}.silver.customers_history",
+        "{catalog}.silver.sales_orders",
+        "{catalog}.silver.order_products",
+        "{catalog}.silver.promotions",
+        "{catalog}.silver.clicked_items",
+        "{catalog}.silver.sales",
+        "{catalog}.gold.dim_customer",
+        "{catalog}.gold.dim_product",
+        "{catalog}.gold.dim_date",
+        "{catalog}.gold.dim_order",
+        "{catalog}.gold.fact_sales",
+        "{catalog}.gold.fact_pos_sales"
+    ],
+    "vacuum_retention_hours": 168
+}

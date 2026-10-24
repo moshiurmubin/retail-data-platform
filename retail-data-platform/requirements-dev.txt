@@ -1,0 +1,4 @@
+# Local / CI test dependencies (Databricks already has Spark and Delta)
+pyspark==3.5.3
+delta-spark==3.2.1
+pytest==8.3.3

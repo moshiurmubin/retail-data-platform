@@ -1,0 +1,42 @@
+{
+    "source": {
+        "sales_orders": "{catalog}.silver.sales_orders",
+        "order_products": "{catalog}.silver.order_products",
+        "promotions": "{catalog}.silver.promotions"
+    },
+    "dimensions": {
+        "dim_customer": "{catalog}.gold.dim_customer",
+        "dim_product": "{catalog}.gold.dim_product",
+        "dim_date": "{catalog}.gold.dim_date"
+    },
+    "target": {
+        "target_table": "{catalog}.gold.fact_sales"
+    },
+    "transform": {
+        "default_discount": 0.0,
+        "default_promo_quantity": 0
+    },
+    "select_columns": [
+        "order_number",
+        "customer_id",
+        "product_id",
+        "order_date_key",
+        "qty",
+        "unit_price",
+        "discount",
+        "promo_quantity",
+        "total_amount",
+        "channel"
+    ],
+    "cast_columns": {
+        "customer_id": "long",
+        "product_id": "string",
+        "order_date_key": "int",
+        "qty": "long",
+        "unit_price": "double",
+        "total_amount": "double",
+        "order_number": "long",
+        "discount": "double",
+        "promo_quantity": "long"
+    }
+}

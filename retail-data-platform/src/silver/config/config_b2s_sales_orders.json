@@ -1,0 +1,211 @@
+{
+    "source": {
+        "source_name": "cosmosdb_sales_orders",
+        "source_table": "{catalog}.bronze.cosmosdb_sales_orders"
+    },
+    "tables": {
+        "sales_orders": {
+            "target_table": "{catalog}.silver.sales_orders",
+            "cast_columns": {
+                "order_number": "long",
+                "customer_id": "long",
+                "number_of_line_items": "long",
+                "order_timestamp": "timestamp"
+            },
+            "select_columns": [
+                "order_number",
+                "customer_id",
+                "customer_name",
+                "number_of_line_items",
+                "order_timestamp",
+                "last_update_ts"
+            ],
+            "quarantine": {
+                "table": "{catalog}.silver.sales_orders_quarantine",
+                "rules": [
+                    {
+                        "name": "order_number_not_null",
+                        "condition": "order_number IS NOT NULL"
+                    },
+                    {
+                        "name": "customer_id_not_null",
+                        "condition": "customer_id IS NOT NULL"
+                    }
+                ]
+            },
+            "deduplication": {
+                "enabled": true,
+                "key_columns": [
+                    "order_number"
+                ],
+                "order_by": [
+                    {
+                        "column": "order_timestamp",
+                        "direction": "desc",
+                        "nulls": "last"
+                    }
+                ]
+            },
+            "scd": {
+                "type": 1,
+                "key_columns": [
+                    "order_number"
+                ]
+            }
+        },
+        "order_products": {
+            "target_table": "{catalog}.silver.order_products",
+            "cast_columns": {
+                "order_number": "long",
+                "customer_id": "long",
+                "product_id": "string",
+                "price": "double",
+                "qty": "long"
+            },
+            "select_columns": [
+                "order_number",
+                "customer_id",
+                "product_id",
+                "product_name",
+                "price",
+                "currency",
+                "qty",
+                "unit",
+                "last_update_ts"
+            ],
+            "quarantine": {
+                "table": "{catalog}.silver.order_products_quarantine",
+                "rules": [
+                    {
+                        "name": "order_number_not_null",
+                        "condition": "order_number IS NOT NULL"
+                    },
+                    {
+                        "name": "qty_positive",
+                        "condition": "qty > 0"
+                    },
+                    {
+                        "name": "price_not_negative",
+                        "condition": "price >= 0"
+                    }
+                ]
+            },
+            "deduplication": {
+                "enabled": true,
+                "key_columns": [
+                    "order_number",
+                    "product_id"
+                ],
+                "order_by": [
+                    {
+                        "column": "qty",
+                        "direction": "desc",
+                        "nulls": "last"
+                    }
+                ]
+            },
+            "scd": {
+                "type": 1,
+                "key_columns": [
+                    "order_number",
+                    "product_id"
+                ]
+            }
+        },
+        "promotions": {
+            "target_table": "{catalog}.silver.promotions",
+            "cast_columns": {
+                "order_number": "long",
+                "customer_id": "long",
+                "discount": "double",
+                "promo_quantity": "long"
+            },
+            "select_columns": [
+                "order_number",
+                "customer_id",
+                "promo_id",
+                "promo_product_id",
+                "discount",
+                "promo_quantity",
+                "last_update_ts"
+            ],
+            "quarantine": {
+                "table": "{catalog}.silver.promotions_quarantine",
+                "rules": [
+                    {
+                        "name": "discount_between_0_and_1",
+                        "condition": "discount BETWEEN 0 AND 1"
+                    }
+                ]
+            },
+            "deduplication": {
+                "enabled": true,
+                "key_columns": [
+                    "order_number",
+                    "promo_id",
+                    "promo_product_id"
+                ],
+                "order_by": [
+                    {
+                        "column": "discount",
+                        "direction": "desc",
+                        "nulls": "last"
+                    }
+                ]
+            },
+            "scd": {
+                "type": 1,
+                "key_columns": [
+                    "order_number",
+                    "promo_id",
+                    "promo_product_id"
+                ]
+            }
+        },
+        "clicked_items": {
+            "target_table": "{catalog}.silver.clicked_items",
+            "cast_columns": {
+                "order_number": "long",
+                "customer_id": "long",
+                "score": "long"
+            },
+            "select_columns": [
+                "order_number",
+                "customer_id",
+                "product_id",
+                "score",
+                "last_update_ts"
+            ],
+            "quarantine": {
+                "table": "{catalog}.silver.clicked_items_quarantine",
+                "rules": [
+                    {
+                        "name": "score_not_negative",
+                        "condition": "score IS NULL OR score >= 0"
+                    }
+                ]
+            },
+            "deduplication": {
+                "enabled": true,
+                "key_columns": [
+                    "order_number",
+                    "product_id"
+                ],
+                "order_by": [
+                    {
+                        "column": "score",
+                        "direction": "desc",
+                        "nulls": "last"
+                    }
+                ]
+            },
+            "scd": {
+                "type": 1,
+                "key_columns": [
+                    "order_number",
+                    "product_id"
+                ]
+            }
+        }
+    }
+}

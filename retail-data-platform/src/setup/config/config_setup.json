@@ -1,0 +1,14 @@
+{
+    "catalog": "{catalog}",
+    "schemas": {
+        "bronze": "Raw data as received, plus audit columns",
+        "silver": "Cleaned, flattened, deduplicated data with SCD",
+        "gold": "Kimball star schema for BI and AI",
+        "audit": "Pipeline run log and data quality results"
+    },
+    "volume": {
+        "schema": "bronze",
+        "name": "raw_data",
+        "comment": "Raw landing area: <source>/load_date=YYYY-MM-DD"
+    }
+}

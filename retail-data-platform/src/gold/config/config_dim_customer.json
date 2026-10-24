@@ -1,0 +1,28 @@
+{
+    "source": {
+        "source_table": "{catalog}.silver.customers"
+    },
+    "target": {
+        "target_table": "{catalog}.gold.dim_customer"
+    },
+    "transform": {
+        "default_customer_type": "Unknown"
+    },
+    "select_columns": [
+        "customer_id",
+        "first_name",
+        "last_name",
+        "full_name",
+        "city",
+        "state",
+        "loyalty_segment",
+        "customer_type",
+        "created_date",
+        "last_updated"
+    ],
+    "cast_columns": {
+        "customer_id": "long",
+        "created_date": "date",
+        "last_updated": "timestamp"
+    }
+}

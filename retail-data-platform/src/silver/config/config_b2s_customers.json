@@ -1,0 +1,118 @@
+{
+    "source": {
+        "source_name": "sqlserver_customers",
+        "source_table": "{catalog}.bronze.sqlserver_customers"
+    },
+    "default_country": "USA",
+    "rename_columns": {},
+    "drop_columns": [
+        "name_parts",
+        "customer_name",
+        "file_path",
+        "load_date",
+        "source_system"
+    ],
+    "cast_columns": {
+        "customer_id": "long",
+        "tax_id": "string",
+        "tax_code": "string",
+        "state": "string",
+        "city": "string",
+        "postcode": "string",
+        "street": "string",
+        "number": "string",
+        "unit": "string",
+        "region": "string",
+        "district": "string",
+        "lon": "double",
+        "lat": "double",
+        "ship_to_address": "string",
+        "valid_from": "timestamp",
+        "valid_to": "timestamp",
+        "units_purchased": "long",
+        "loyalty_segment": "string",
+        "last_update_ts": "timestamp"
+    },
+    "select_columns": [
+        "customer_id",
+        "first_name",
+        "last_name",
+        "tax_id",
+        "tax_code",
+        "country",
+        "state",
+        "city",
+        "postcode",
+        "street",
+        "number",
+        "unit",
+        "region",
+        "district",
+        "lon",
+        "lat",
+        "ship_to_address",
+        "valid_from",
+        "valid_to",
+        "units_purchased",
+        "loyalty_segment",
+        "last_update_ts"
+    ],
+    "quarantine": {
+        "table": "{catalog}.silver.customers_quarantine",
+        "rules": [
+            {
+                "name": "customer_id_not_null",
+                "condition": "customer_id IS NOT NULL"
+            },
+            {
+                "name": "units_purchased_not_negative",
+                "condition": "units_purchased IS NULL OR units_purchased >= 0"
+            }
+        ]
+    },
+    "deduplication": {
+        "enabled": true,
+        "key_columns": [
+            "customer_id"
+        ],
+        "order_by": [
+            {
+                "column": "last_update_ts",
+                "direction": "desc",
+                "nulls": "last"
+            },
+            {
+                "column": "valid_from",
+                "direction": "desc",
+                "nulls": "last"
+            }
+        ]
+    },
+    "scd": [
+        {
+            "type": 1,
+            "target_table": "{catalog}.silver.customers",
+            "key_columns": [
+                "customer_id"
+            ]
+        },
+        {
+            "type": 2,
+            "target_table": "{catalog}.silver.customers_history",
+            "key_columns": [
+                "customer_id"
+            ],
+            "tracked_columns": [
+                "first_name",
+                "last_name",
+                "state",
+                "city",
+                "postcode",
+                "street",
+                "number",
+                "unit",
+                "loyalty_segment"
+            ]
+        }
+    ]
+}

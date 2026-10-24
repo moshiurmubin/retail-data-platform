@@ -1,0 +1,184 @@
+{
+    "fail_on_error": false,
+    "table_comments": {
+        "{catalog}.silver.customers": "Current customers from the SQL Server CRM (SCD Type 1)",
+        "{catalog}.silver.customers_history": "Customer history (SCD Type 2): one row per version, is_current marks the latest",
+        "{catalog}.silver.sales_orders": "Web-shop orders from Cosmos DB, one row per order",
+        "{catalog}.silver.order_products": "Web-shop order lines, one row per order + product",
+        "{catalog}.silver.promotions": "Promotions applied to web-shop orders",
+        "{catalog}.silver.clicked_items": "Products a customer clicked before ordering",
+        "{catalog}.silver.sales": "Physical-store sales from S3, one row per customer + product + date",
+        "{catalog}.gold.dim_customer": "Customer dimension. customer_id = -1 is the Unknown member",
+        "{catalog}.gold.dim_product": "Product dimension. product_id = 'UNKNOWN' is the Unknown member",
+        "{catalog}.gold.dim_date": "Calendar dimension, one row per day. date_key = yyyyMMdd, -1 = Unknown",
+        "{catalog}.gold.dim_order": "Order dimension, one row per web-shop order",
+        "{catalog}.gold.fact_sales": "Online sales fact. Grain: one row per order line. total_amount = qty * unit_price * (1 - discount)",
+        "{catalog}.gold.fact_pos_sales": "Store sales fact. Grain: one row per customer + product + date"
+    },
+    "column_comments": {
+        "{catalog}.gold.fact_sales": {
+            "total_amount": "qty * unit_price * (1 - discount), rounded to 2 decimals",
+            "discount": "Fraction 0-1; 0 when no promotion"
+        },
+        "{catalog}.gold.dim_customer": {
+            "customer_type": "Segment_<loyalty_segment>, Unknown when missing"
+        }
+    },
+    "table_tags": {
+        "{catalog}.bronze.sqlserver_customers": {
+            "layer": "bronze",
+            "source": "sqlserver",
+            "contains_pii": "true"
+        },
+        "{catalog}.bronze.cosmosdb_sales_orders": {
+            "layer": "bronze",
+            "source": "cosmosdb",
+            "contains_pii": "true"
+        },
+        "{catalog}.bronze.s3_sales": {
+            "layer": "bronze",
+            "source": "s3",
+            "contains_pii": "true"
+        },
+        "{catalog}.silver.customers": {
+            "layer": "silver",
+            "contains_pii": "true"
+        },
+        "{catalog}.silver.customers_history": {
+            "layer": "silver",
+            "contains_pii": "true"
+        },
+        "{catalog}.gold.dim_customer": {
+            "layer": "gold",
+            "contains_pii": "true"
+        },
+        "{catalog}.gold.fact_sales": {
+            "layer": "gold",
+            "contains_pii": "false"
+        },
+        "{catalog}.gold.fact_pos_sales": {
+            "layer": "gold",
+            "contains_pii": "false"
+        }
+    },
+    "column_tags": {
+        "{catalog}.silver.customers": {
+            "first_name": {
+                "pii": "name"
+            },
+            "last_name": {
+                "pii": "name"
+            },
+            "tax_id": {
+                "pii": "tax_id"
+            },
+            "street": {
+                "pii": "address"
+            },
+            "lat": {
+                "pii": "location"
+            },
+            "lon": {
+                "pii": "location"
+            }
+        },
+        "{catalog}.gold.dim_customer": {
+            "first_name": {
+                "pii": "name"
+            },
+            "last_name": {
+                "pii": "name"
+            },
+            "full_name": {
+                "pii": "name"
+            }
+        }
+    },
+    "secure_views": [
+        {
+            "view": "{catalog}.gold.vw_dim_customer_secure",
+            "source": "{catalog}.gold.dim_customer",
+            "pii_reader_group": "pii_readers",
+            "masked_columns": [
+                "first_name",
+                "last_name",
+                "full_name"
+            ]
+        }
+    ],
+    "grants": [
+        {
+            "privileges": [
+                "USE CATALOG"
+            ],
+            "securable_type": "CATALOG",
+            "securable": "{catalog}",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "USE SCHEMA"
+            ],
+            "securable_type": "SCHEMA",
+            "securable": "{catalog}.gold",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.fact_sales",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.fact_pos_sales",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.dim_product",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.dim_date",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.dim_order",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.vw_dim_customer_secure",
+            "principal": "account users"
+        },
+        {
+            "privileges": [
+                "SELECT"
+            ],
+            "securable_type": "TABLE",
+            "securable": "{catalog}.gold.vw_sales_all_channels",
+            "principal": "account users"
+        }
+    ],
+    "_note": "account users get SELECT on Gold only, and see customers through the masked view. dim_customer itself is not granted."
+}

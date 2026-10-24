@@ -1,0 +1,51 @@
+{
+    "table": "{catalog}.silver.sales_orders",
+    "layer": "SILVER",
+    "checks": [
+        {
+            "name": "sales_orders_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_number_not_null",
+            "type": "not_null",
+            "column": "order_number",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_number_unique",
+            "type": "unique",
+            "columns": [
+                "order_number"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_not_null",
+            "type": "not_null",
+            "column": "customer_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_timestamp_not_null",
+            "type": "not_null",
+            "column": "order_timestamp",
+            "severity": "warn",
+            "on_failure": "warn"
+        },
+        {
+            "name": "number_of_line_items_range",
+            "type": "range",
+            "column": "number_of_line_items",
+            "min": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        }
+    ]
+}

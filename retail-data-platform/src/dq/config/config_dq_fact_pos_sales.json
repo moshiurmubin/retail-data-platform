@@ -1,0 +1,79 @@
+{
+    "table": "{catalog}.gold.fact_pos_sales",
+    "layer": "GOLD",
+    "checks": [
+        {
+            "name": "fact_pos_sales_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_not_null",
+            "type": "not_null",
+            "column": "customer_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "product_id_not_null",
+            "type": "not_null",
+            "column": "product_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_date_key_not_null",
+            "type": "not_null",
+            "column": "order_date_key",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "total_amount_not_negative",
+            "type": "range",
+            "column": "total_amount",
+            "min": 0,
+            "severity": "warn",
+            "on_failure": "warn"
+        },
+        {
+            "name": "customer_id_fk_dim_customer",
+            "type": "referential_integrity",
+            "child_column": "customer_id",
+            "parent_table": "{catalog}.gold.dim_customer",
+            "parent_column": "customer_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "product_id_fk_dim_product",
+            "type": "referential_integrity",
+            "child_column": "product_id",
+            "parent_table": "{catalog}.gold.dim_product",
+            "parent_column": "product_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "order_date_key_fk_dim_date",
+            "type": "referential_integrity",
+            "child_column": "order_date_key",
+            "parent_table": "{catalog}.gold.dim_date",
+            "parent_column": "date_key",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "fact_rows_match_sales",
+            "type": "reconciliation",
+            "source_table": "{catalog}.silver.sales",
+            "source_aggregation": "count",
+            "target_aggregation": "count",
+            "tolerance": 0,
+            "severity": "warn",
+            "on_failure": "warn"
+        }
+    ]
+}

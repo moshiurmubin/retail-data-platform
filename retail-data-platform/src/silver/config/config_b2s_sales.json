@@ -1,0 +1,74 @@
+{
+    "source": {
+        "source_name": "s3_sales",
+        "source_table": "{catalog}.bronze.s3_sales"
+    },
+    "target": {
+        "target_table": "{catalog}.silver.sales"
+    },
+    "rename_columns": {},
+    "cast_columns": {
+        "customer_id": "long",
+        "order_date": "date",
+        "product_id": "string",
+        "product_price": "double",
+        "quantity": "long",
+        "total_price": "double",
+        "last_update_ts": "timestamp"
+    },
+    "select_columns": [
+        "customer_id",
+        "customer_name",
+        "product_name",
+        "order_date",
+        "product_category",
+        "currency",
+        "product_id",
+        "product_name_json",
+        "product_price",
+        "quantity",
+        "unit",
+        "total_price",
+        "last_update_ts"
+    ],
+    "quarantine": {
+        "table": "{catalog}.silver.sales_quarantine",
+        "rules": [
+            {
+                "name": "customer_id_not_null",
+                "condition": "customer_id IS NOT NULL"
+            },
+            {
+                "name": "order_date_not_null",
+                "condition": "order_date IS NOT NULL"
+            },
+            {
+                "name": "product_id_not_null",
+                "condition": "product_id IS NOT NULL"
+            }
+        ]
+    },
+    "deduplication": {
+        "enabled": true,
+        "key_columns": [
+            "customer_id",
+            "product_id",
+            "order_date"
+        ],
+        "order_by": [
+            {
+                "column": "last_update_ts",
+                "direction": "desc",
+                "nulls": "last"
+            }
+        ]
+    },
+    "scd": {
+        "type": 1,
+        "key_columns": [
+            "customer_id",
+            "product_id",
+            "order_date"
+        ]
+    }
+}

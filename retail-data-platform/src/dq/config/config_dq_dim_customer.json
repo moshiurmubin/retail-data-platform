@@ -1,0 +1,36 @@
+{
+    "table": "{catalog}.gold.dim_customer",
+    "layer": "GOLD",
+    "checks": [
+        {
+            "name": "dim_customer_not_empty",
+            "type": "min_row_count",
+            "threshold": 1,
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_not_null",
+            "type": "not_null",
+            "column": "customer_id",
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "customer_id_unique",
+            "type": "unique",
+            "columns": [
+                "customer_id"
+            ],
+            "severity": "error",
+            "on_failure": "fail"
+        },
+        {
+            "name": "full_name_not_null",
+            "type": "not_null",
+            "column": "full_name",
+            "severity": "warn",
+            "on_failure": "warn"
+        }
+    ]
+}
