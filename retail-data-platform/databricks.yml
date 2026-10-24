@@ -33,18 +33,14 @@ targets:
     mode: development
     default: true
     workspace:
-      # Replace with YOUR workspace URL (copy it from the browser address bar)
-      host: https://<your-workspace-id>.cloud.databricks.com
+      host: https://dbc-8fd5989c-f9ed.cloud.databricks.com
 
   prod:
     mode: production
     workspace:
-      host: https://<your-workspace-id>.cloud.databricks.com
+      host: https://dbc-8fd5989c-f9ed.cloud.databricks.com
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: retaildataplatform_prod
       secret_scope: retail-platform-prod
       schedule_pause_status: UNPAUSED
-    # Production should run as a service principal, not a person:
-    # run_as:
-    #   service_principal_name: <application-id-of-your-service-principal>
