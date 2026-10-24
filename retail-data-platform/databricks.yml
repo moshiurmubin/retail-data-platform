@@ -33,6 +33,10 @@ targets:
     mode: development
     default: true
     workspace:
+<<<<<<< Updated upstream
+=======
+      # Replace with YOUR workspace URL (copy it from the browser address bar)
+>>>>>>> Stashed changes
       host: https://dbc-8fd5989c-f9ed.cloud.databricks.com
 
   prod:

@@ -45,3 +45,11 @@ try:
 except Exception as e:
     run.failure(e)
     raise
+
+# COMMAND ----------
+
+# Does the scope exist?
+print([s.name for s in dbutils.secrets.listScopes()])
+
+# Which keys are inside it?
+print([s.key for s in dbutils.secrets.list("retail-platform-dev")])
